@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ar-TN" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BipoCare+ | منصة المرافقين</title>
+    <meta name="description" content="منصة تعليمية وتوعوية للمرافقين والعائلات لمرضى اضطراب ثنائي القطب. تثقيف صحي وأدوات تقييم.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f8fafc;
+            overflow-x: hidden;
+            color: #1e293b;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0f766e; }
+
+        /* Glassmorphism Header */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(13, 148, 136, 0.12);
+            transition: all 0.4s ease;
+        }
+        .glass-nav.scrolled {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        /* Underline Animation on Nav links */
+        .nav-link {
+            position: relative;
+            color: #475569;
+            font-weight: 700;
+            transition: color 0.25s;
+            padding-bottom: 2px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: #0d9488;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover { color: #0d9488; }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Hover Effects */
+        .hover-lift {
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.09);
+        }
+
+        /* Custom Radios */
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .tf-grid { grid-template-columns: 1fr 1fr; }
+        
+        .radio-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.65rem 0.5rem;
+            border-radius: 0.75rem;
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-weight: 700;
+            color: #475569;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+        .radio-label:hover { background: #e2e8f0; border-color: #cbd5e1; }
+        
+        .radio-input:checked + .radio-label {
+            background: #e0f2fe;
+            border-color: #0ea5e9;
+            color: #0369a1;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+        }
+        .radio-input { display: none; }
+
+        .tf-true:checked + .radio-label {
+            background: #dcfce7; border-color: #10b981; color: #047857;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+        .tf-false:checked + .radio-label {
+            background: #fee2e2; border-color: #ef4444; color: #b91c1c;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-14px); }
+        }
+        .floating { animation: float 4.5s ease-in-out infinite; }
+
+        /* Progress Bar Animation */
+        @keyframes fillBar {
+            from { width: 0; }
+            to { width: var(--target-width); }
+        }
+        .progress-bar {
+            height: 10px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            animation: fillBar 1.5s ease forwards;
+        }
+
+        /* Pulse Ring Animation */
+        @keyframes pulseRing {
+            0% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+        .pulse-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            animation: pulseRing 1.6s ease-out infinite;
+        }
+
+        /* Mobile Menu Max-Height Animation */
+        #mobileMenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        #mobileMenu.open { max-height: 320px; }
+
+        /* Modal Overlay */
+        #modal-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        #modal-overlay.open { display: flex; }
+        #modal-box {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            max-width: 480px;
+            width: 100%;
+            animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Scroll To Top Button */
+        #scrollTopBtn {
+            position: fixed; bottom: 1.5rem; left: 1.5rem; z-index: 999;
+            background: #0d9488; color: white;
+            width: 48px; height: 48px; border-radius: 50%;
+            border: none; cursor: pointer;
+            display: none; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px rgba(13, 148, 136, 0.4);
+            transition: all 0.3s; font-size: 1.2rem;
+        }
+        #scrollTopBtn:hover { background: #0f766e; transform: translateY(-3px); }
+        #scrollTopBtn.show { display: flex; }
+
+        /* Smooth Show Result */
+        .result-show {
+            animation: resultAppear 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+        }
+        @keyframes resultAppear {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Comment append animation */
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .comment-item {
+            animation: slideDownFade 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="scrollTopBtn" aria-label="العودة للأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div id="modal-box" class="shadow-2xl">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="bg-amber-100 p-2 rounded-xl">
+                    <i class="fas fa-triangle-exclamation text-2xl text-amber-500"></i>
+                </div>
+                <h2 id="modal-title" class="text-xl font-extrabold text-slate-800">تنبيه مهم</h2>
+            </div>
+            <p class="text-slate-600 font-semibold leading-relaxed mb-4 text-sm md:text-base">
+                هذه المنصة هي <span class="text-teal-700 font-bold">أداة تعليمية وتوعوية فقط</span>. أدوات التقييم الموجودة لا تُغني أبداً عن استشارة طبيب أو مختص نفسي.
+            </p>
+            <p class="text-slate-600 font-semibold leading-relaxed mb-6 text-sm md:text-base">
+                إذا كنت في حالة طوارئ أو لاحظت خطراً مباشراً على المريض، اتصل بخدمات الطوارئ فوراً.
+            </p>
+            <button id="closeModal" class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-3 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity">
+                فهمت، تابع
+            </button>
+        </div>
+    </div>
+
+    <nav id="mainNav" class="glass-nav fixed w-full top-0 z-50 shadow-sm" role="navigation" aria-label="التنقل الرئيسي">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+                    <div class="bg-teal-100 p-2 rounded-lg shadow-sm">
+                        <i class="fas fa-brain text-2xl text-teal-600"></i>
+                    </div>
+                    <span class="text-2xl font-extrabold text-teal-800 tracking-wider">BipoCare<span class="text-amber-500">+</span></span>
+                </div>
+                
+                <button id="menuBtn" class="md:hidden text-2xl text-teal-700 hover:text-teal-900 focus:outline-none p-1 rounded-lg focus:ring-2 focus:ring-teal-400" aria-label="فتح القائمة" aria-expanded="false" aria-controls="mobileMenu">
+                    <i id="menuIcon" class="fas fa-bars"></i>
+                </button>
+                
+                <div class="hidden md:flex items-center space-x-8 space-x-reverse">
+                    <a href="#home" class="nav-link">الباج الرئيسية</a>
+                    <a href="#stats" class="nav-link">إحصاءات</a>
+                    <a href="#brochure" class="nav-link">الكتيب التوعوي</a>
+                    <a href="#assessment" class="nav-link">التاست (التقييم)</a>
+                    <a href="#recommendations" class="nav-link">توصيات المرافقين</a>
+                </div>
+            </div>
+            
+            <div id="mobileMenu" role="menu" class="md:hidden mt-2">
+                <div class="pb-4 space-y-2">
+                    <a href="#home" class="block px-4 py-2 bg-teal-50 text-teal-700 rounded-lg font-bold hover:bg-teal-100 transition-colors" role="menuitem">الباج الرئيسية</a>
+                    <a href="#stats" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg font-bold transition-colors" role="menuitem">إحصاءات</a>
+                    <a href="#brochure" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg font-bold transition-colors" role="menuitem">الكتيب التوعوي</a>
+                    <a href="#assessment" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg font-bold transition-colors" role="menuitem">التاست (التقييم)</a>
+                    <a href="#recommendations" class="block px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg font-bold transition-colors" role="menuitem">توصيات المرافقين</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="pt-32 pb-20 relative overflow-hidden bg-gradient-to-br from-slate-50 via-teal-50 to-emerald-50">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-teal-200 opacity-20 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-amber-200 opacity-20 blur-3xl pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                
+                <div class="flex-1 text-center md:text-right" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="inline-block bg-white text-teal-700 px-4 py-1 rounded-full text-sm font-bold shadow-sm mb-6 border border-teal-100">
+                        <i class="fas fa-stethoscope mr-2 ml-2"></i> دليل المرافقة النفسية · UPSAT 2026
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-800 mb-6 leading-tight">
+                        تتلهى بشكون مريض <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500">بثنائي القطب (Bipolaire)؟</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-slate-600 mb-8 font-semibold leading-relaxed max-w-xl mx-auto md:mx-0">
+                        بلاتفورم BipoCare+ تعاونك باش تفهم دورك، تعاون مريضك، وتحمي صحتك النفسية إنت زادة، خاطر وقفتك تصنع الفارق.
+                    </p>
+
+                    <div class="bg-gradient-to-r from-amber-100 to-amber-50 border-r-4 border-amber-500 p-4 rounded-xl mb-8 flex items-start gap-3 shadow-sm max-w-xl mx-auto md:mx-0">
+                        <i class="fas fa-triangle-exclamation text-amber-600 mt-0.5 flex-shrink-0"></i>
+                        <p class="text-amber-900 font-bold text-xs md:text-sm text-right leading-relaxed">
+                            هذه المنصة للتوعية والتثقيف الصحي فقط ولا تُغني عن استشارة الطبيب المختص.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <a href="#brochure" class="bg-white text-teal-700 text-base md:text-lg font-bold py-4 px-8 rounded-xl shadow-md border-2 border-teal-100 hover:border-teal-400 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+                            <i class="fas fa-book-open"></i> اقرا الكتيب
+                        </a>
+                        <a href="#assessment" class="bg-gradient-to-r from-teal-600 to-emerald-600 text-white text-base md:text-lg font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-teal-500/30 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+                            أبدا التاست توة <i class="fas fa-arrow-left"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="flex-1 w-full max-w-md mx-auto" data-aos="zoom-in" data-aos-duration="1200" data-aos-delay="200">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-teal-400 to-amber-300 rounded-[2rem] transform rotate-3 scale-105 opacity-20 blur-lg pointer-events-none"></div>
+                        <div class="bg-white p-8 rounded-[2rem] shadow-2xl relative border border-white floating">
+                            <div class="bg-teal-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
+                                <i class="fas fa-hands-holding-child text-5xl text-teal-500"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-center text-slate-800 mb-4">المرض يتداوى والوقاية ممكنة</h3>
+                            <div class="w-16 h-1 bg-amber-400 mx-auto rounded-full mb-4"></div>
+                            <p class="text-center text-slate-600 text-base md:text-lg font-medium leading-relaxed">
+                                "لازم تستحفظ على روحك باش تنجم تعاونو. صحة المرافق هي الأساس في نجاح العلاج."
+                            </p>
+                            <div class="mt-6 flex justify-center gap-2 flex-wrap">
+                                <span class="bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-100">علمي 🔬</span>
+                                <span class="bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-100">مجاني ✅</span>
+                                <span class="bg-slate-50 text-slate-600 text-xs font-bold px-3 py-1 rounded-full border border-slate-200">بالدارجة 💬</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="py-16 bg-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-teal-50/40 to-emerald-50/40 pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-3">إحصاءات تبعث على الأمل</h2>
+                <p class="text-slate-500 font-semibold text-lg">حقائق علمية تؤكد أهمية العلاج والدعم العائلي</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-white border border-slate-100 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl md:text-4xl font-extrabold text-teal-600 mb-1" data-count="45">0</div>
+                    <div class="text-slate-500 font-bold text-xs md:text-sm">مليون مصاب يتلقون الدعم عالمياً</div>
+                    <div class="progress-bar"><div class="progress-fill bg-teal-500" style="--target-width:78%"></div></div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl md:text-4xl font-extrabold text-amber-500 mb-1" data-count="25">0</div>
+                    <div class="text-slate-500 font-bold text-xs md:text-sm">سنة متوسط عمر اكتشاف واستقرار الحالة</div>
+                    <div class="progress-bar"><div class="progress-fill bg-amber-500" style="--target-width:55%"></div></div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl md:text-4xl font-extrabold text-blue-600 mb-1" data-count="70" data-suffix="%">0</div>
+                    <div class="text-slate-500 font-bold text-xs md:text-sm">انخفاض في الانتكاسات بفضل وعي العائلة</div>
+                    <div class="progress-bar"><div class="progress-fill bg-blue-500" style="--target-width:70%"></div></div>
+                </div>
+                <div class="bg-white border border-slate-100 rounded-2xl p-6 text-center shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl md:text-4xl font-extrabold text-emerald-600 mb-1" data-count="80" data-suffix="%">0</div>
+                    <div class="text-slate-500 font-bold text-xs md:text-sm">يسترجعون استقرارهم التام مع العلاج</div>
+                    <div class="progress-bar"><div class="progress-fill bg-emerald-500" style="--target-width:80%"></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="brochure" class="py-24 bg-slate-50 relative">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="inline-block bg-teal-100 text-teal-800 px-4 py-1 rounded-full text-xs font-bold mb-3">📚 الكتيب التوعوي</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 mb-4">الكتيب التوعوي للمرافق</h2>
+                <p class="text-lg md:text-xl text-slate-500 font-semibold max-w-2xl mx-auto">كل ما يخص اضطراب ثنائي القطب والوقاية الفعالة من الأزمات النفسية.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-t-emerald-500 hover-lift relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-emerald-50 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-brain text-2xl text-emerald-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">شنوة اضطراب ثنائي القطب؟</h3>
+                    <p class="text-slate-600 mb-4 font-medium leading-relaxed text-sm md:text-base">مرض نفسي مزمن. المريض يتعدى بفترات متناقضة:</p>
+                    <ul class="space-y-3 text-sm font-semibold">
+                        <li class="flex items-center text-slate-700"><span class="w-2.5 h-2.5 bg-amber-500 rounded-full ml-2 flex-shrink-0"></span><span class="text-amber-600 ml-1 font-bold">هوس (Manie):</span> نشاط زايد</li>
+                        <li class="flex items-center text-slate-700"><span class="w-2.5 h-2.5 bg-blue-500 rounded-full ml-2 flex-shrink-0"></span><span class="text-blue-600 ml-1 font-bold">اكتئاب (Dépression):</span> حزن كبير</li>
+                        <li class="flex items-center text-slate-700"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full ml-2 flex-shrink-0"></span><span class="text-emerald-600 ml-1 font-bold">استقرار (Stabilité):</span> حالة عادية</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-t-blue-500 hover-lift relative overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-blue-50 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-question-circle text-2xl text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">أهمية احتواء الأزمات</h3>
+                    <p class="text-slate-600 mb-4 font-medium leading-relaxed text-sm md:text-base">الضغط النفسي ينجم يزيد وقت النوبة خاصة عند:</p>
+                    <ul class="space-y-2 text-sm text-slate-700 font-semibold mb-6">
+                        <li class="flex items-center"><i class="fas fa-angle-left text-blue-500 ml-2"></i> فترة الاكتئاب القوية</li>
+                        <li class="flex items-center"><i class="fas fa-angle-left text-blue-500 ml-2"></i> التوقف المفاجئ عن الدواء</li>
+                        <li class="flex items-center"><i class="fas fa-angle-left text-blue-500 ml-2"></i> العزلة والستراس العالي</li>
+                    </ul>
+                    <div class="p-3 bg-blue-50 rounded-xl text-blue-800 text-xs font-bold border border-blue-100 leading-relaxed">
+                        <i class="fas fa-info-circle ml-1 text-blue-600"></i> الحوار المفتوح والإنصات الهادئ يخفف العبء النفسي بشكل كبير!
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-t-red-500 hover-lift relative overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-red-50 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-triangle-exclamation text-2xl text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">علامات تستوجب الانتباه</h3>
+                    <ul class="space-y-3 text-sm text-slate-700 font-semibold leading-relaxed">
+                        <li class="flex items-start gap-2"><i class="fas fa-circle-exclamation text-red-500 mt-1 flex-shrink-0"></i> تعبير متكرر عن اليأس الشديد.</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-circle-exclamation text-red-500 mt-1 flex-shrink-0"></i> الميل المفاجئ للعزلة والابتعاد.</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-circle-exclamation text-red-500 mt-1 flex-shrink-0"></i> اضطراب حاد في نمط النوم.</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-circle-exclamation text-red-500 mt-1 flex-shrink-0"></i> تهيج مفرط (Agitation) غير معتاد.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-t-purple-500 hover-lift relative overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+                    <div class="bg-purple-50 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-pills text-2xl text-purple-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">أهمية الدواء والمتابعة</h3>
+                    <div class="space-y-4 text-sm font-semibold text-slate-700 mb-6">
+                        <p class="flex items-center gap-2"><i class="fas fa-shield-virus text-purple-500 text-lg flex-shrink-0"></i> الدواء يمنع الانتكاسات (Rechutes).</p>
+                        <p class="flex items-center gap-2"><i class="fas fa-user-doctor text-purple-500 text-lg flex-shrink-0"></i> المتابعة ضرورية حتى والمريض لباس.</p>
+                    </div>
+                    <div class="p-3 bg-red-50 text-red-800 rounded-xl text-xs font-bold border border-red-100 leading-relaxed">
+                        <i class="fas fa-ban ml-1 text-red-600"></i> إياك توقف الدواء من غير ما تشاور الطبيب!
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-8 shadow-md border-t-4 border-t-amber-500 hover-lift relative overflow-hidden" data-aos="fade-up" data-aos-delay="500">
+                    <div class="bg-amber-50 w-14 h-14 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-hand-holding-heart text-2xl text-amber-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">دورك كمرافق (Aidant)</h3>
+                    <ul class="space-y-3 text-sm text-slate-700 font-semibold">
+                        <li class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-lg"><i class="fas fa-comments text-amber-500 w-5 text-center flex-shrink-0"></i> أحكي معاه ديما بهدوء.</li>
+                        <li class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-lg"><i class="fas fa-ban text-amber-500 w-5 text-center flex-shrink-0"></i> تجنب النقد والعرك.</li>
+                        <li class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-lg"><i class="fas fa-capsules text-amber-500 w-5 text-center flex-shrink-0"></i> شجعو باش ياخو دواه.</li>
+                        <li class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-lg"><i class="fas fa-eye text-amber-500 w-5 text-center flex-shrink-0"></i> خليك فايق بالتغيرات المزاجية.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gradient-to-br from-teal-600 to-emerald-700 rounded-2xl p-8 shadow-xl text-white hover-lift relative overflow-hidden" data-aos="fade-up" data-aos-delay="600">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+                    
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="relative w-14 h-14 flex-shrink-0">
+                            <div class="pulse-ring"></div>
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm relative z-10">
+                                <i class="fas fa-phone-volume text-2xl text-white"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold">شتعمل وقت الأزمة؟</h3>
+                    </div>
+
+                    <p class="mb-4 font-medium opacity-90 text-sm">كي تحس بضرورة التدخل أو الدعم الفوري:</p>
+                    <ul class="space-y-2.5 text-sm font-bold mb-6">
+                        <li class="flex items-center gap-2"><i class="fas fa-check-circle text-teal-200 flex-shrink-0"></i> خليك بحذاه وطمنو.</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-comment-medical text-teal-200 flex-shrink-0"></i> أحكي معاه بهدوء لامتصاص التوتر.</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-stethoscope text-teal-200 flex-shrink-0"></i> تواصل مع الطبيب المباشر.</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-phone-alt text-teal-200 flex-shrink-0"></i> اطلب المساعدة المختصة عند الحاجة.</li>
+                    </ul>
+
+                    <div class="bg-white/10 rounded-xl p-3 border border-white/20 text-center backdrop-blur-sm">
+                        <p class="text-white font-bold text-xs">🚨 الخط المباشر للدعم النفسي والطوارئ</p>
+                        <a href="tel:71600037" class="text-white text-2xl font-extrabold hover:underline block mt-1 tracking-wide" dir="ltr">037 600 71</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="assessment" class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <span class="inline-block bg-amber-100 text-amber-800 px-4 py-1 rounded-full text-xs font-bold mb-3">🧪 أدوات التقييم العلمية</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 mb-4">أدوات التقييم (Évaluations)</h2>
+                <p class="text-lg md:text-xl text-slate-500 font-semibold">قيم معلوماتك، وقيس نسبة التعب والإرهاق متاعك.</p>
+                <div class="mt-3 inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-1.5 rounded-full text-xs font-bold">
+                    <i class="fas fa-circle-info"></i> هذا التقييم تعليمي وتثقيفي فقط — ليس تشخيصاً طبياً
+                </div>
+            </div>
+            
+            <div class="flex justify-center mb-10 bg-slate-100 p-1.5 rounded-2xl shadow-inner max-w-xl mx-auto" data-aos="zoom-in" role="tablist" aria-label="أدوات التقييم">
+                <button id="tabKnowledge" class="flex-1 py-3.5 px-6 rounded-xl font-bold text-base md:text-lg transition-all duration-300 bg-teal-600 text-white shadow-md" role="tab" aria-selected="true" aria-controls="knowledgeForm">
+                    <i class="fas fa-brain ml-2"></i> تاست المعلومات
+                </button>
+                <button id="tabZarit" class="flex-1 py-3.5 px-6 rounded-xl font-bold text-base md:text-lg text-slate-500 hover:text-slate-700 transition-all duration-300 bg-transparent" role="tab" aria-selected="false" aria-controls="zaritForm">
+                    <i class="fas fa-heart-pulse ml-2"></i> مقياس التعب (Zarit)
+                </button>
+            </div>
+            
+            <div id="knowledgeForm" role="tabpanel" class="bg-white p-6 md:p-8 rounded-[2rem] shadow-xl border border-slate-100 transition-all duration-500" data-aos="fade-up">
+                <div class="bg-teal-50 rounded-2xl p-6 mb-8 text-center border border-teal-100">
+                    <i class="fas fa-clipboard-check text-4xl text-teal-500 mb-3 block"></i>
+                    <h3 class="text-xl md:text-2xl font-bold text-teal-800 mb-2">شنوة تعرف على اضطراب ثنائي القطب؟</h3>
+                    <p class="text-teal-700 font-medium text-sm md:text-base">الأسئلة هاذي مأخوذة من الكتيب العلمي. جاوب بصحيح ولا غالط.</p>
+                </div>
+                
+                <form id="quizKnowledge" novalidate class="space-y-6">
+                    <div id="knowledgeQuestionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    
+                    <p id="knowledgeError" class="hidden text-red-600 font-bold text-center mt-4 p-3 bg-red-50 rounded-xl border border-red-200">
+                        <i class="fas fa-circle-exclamation ml-2"></i> عايشك كمل جاوب على الأسئلة الكل باش النتيجة تكون صحيحة 🩺
+                    </p>
+                    
+                    <button type="button" id="submitKnowledge" class="w-full mt-8 bg-gradient-to-r from-teal-500 to-teal-700 text-white py-4 md:py-5 rounded-2xl font-bold text-lg md:text-xl hover:shadow-lg hover:shadow-teal-500/40 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+                        شوف النتيجة <i class="fas fa-check-circle"></i>
+                    </button>
+                </form>
+                <div id="knowledgeResult" class="hidden mt-8 p-8 rounded-2xl text-center"></div>
+            </div>
+            
+            <div id="zaritForm" role="tabpanel" class="hidden bg-white p-6 md:p-8 rounded-[2rem] shadow-xl border border-slate-100 transition-all duration-500">
+                <div class="bg-amber-50 rounded-2xl p-6 mb-8 text-center border border-amber-100">
+                    <i class="fas fa-battery-quarter text-4xl text-amber-500 mb-3 block"></i>
+                    <h3 class="text-xl md:text-2xl font-bold text-amber-800 mb-2">مقياس التعب (Échelle de Zarit)</h3>
+                    <p class="text-amber-700 font-medium text-sm md:text-base">هذا تقييم علمي بش تفهم قداش التلهية بالمريض مأثرة على نفسيتك. جاوب بصراحة.</p>
+                </div>
+                
+                <form id="quizZarit" novalidate class="space-y-6">
+                    <div id="zaritQuestionsContainer" class="space-y-5"></div>
+                    
+                    <p id="zaritError" class="hidden text-red-600 font-bold text-center mt-4 p-3 bg-red-50 rounded-xl border border-red-200">
+                        <i class="fas fa-circle-exclamation ml-2"></i> الرجاء الإجابة على كل الأسئلة لحساب مقياس التعب بدقة 📊
+                    </p>
+                    
+                    <button type="button" id="submitZarit" class="w-full mt-8 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 md:py-5 rounded-2xl font-bold text-lg md:text-xl hover:shadow-lg hover:shadow-amber-500/40 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+                        احسب قداش تاعب <i class="fas fa-calculator"></i>
+                    </button>
+                </form>
+                <div id="zaritResult" class="hidden mt-8 p-8 rounded-2xl text-center"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="recommendations" class="py-20 bg-gradient-to-br from-slate-50 to-teal-50/30 border-t border-slate-100 relative">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <span class="inline-block bg-teal-100 text-teal-800 px-4 py-1 rounded-full text-xs font-bold mb-3">💬 تجارب حية</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-3">توصيات وتجارب المرافقين</h2>
+                <p class="text-slate-600 font-medium text-base md:text-lg">فضاء مخصص لتبادل النصائح المفيدة والتشجيع بين عائلات المرضى.</p>
+            </div>
+
+            <div id="commentsList" class="space-y-4 mb-10" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex gap-4 items-start">
+                    <div class="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold flex-shrink-0 text-sm">م.س</div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">مريم الساحلي</h4>
+                            <span class="text-xs text-slate-400">مرافقة لأخ · منذ يومين</span>
+                        </div>
+                        <p class="text-slate-600 text-sm md:text-base font-medium leading-relaxed">
+                            "أهم نصيحة نعطيها هي المحافظة على روتين يومي هادئ وتجنب النقاشات الحادة وقت الغضب. التثقيف اللي لقيناه في BipoCare+ فرق معانا برشا في استقرار خويا."
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex gap-4 items-start">
+                    <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold flex-shrink-0 text-sm">أ.ب</div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">أحمد بن علي</h4>
+                            <span class="text-xs text-slate-400">مرافق لزوجته · منذ أسبوع</span>
+                        </div>
+                        <p class="text-slate-600 text-sm md:text-base font-medium leading-relaxed">
+                            "كي تفهم اللي التصرفات المتهيجة هي جزء مالمرض موش مقصودة، ترتاح نفسياً وتنجم تعاون المريض خير. ما تنساوش تاخذوا وقت لراحتكم زادة!"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-slate-200" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="text-lg md:text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-pen-to-square text-teal-600"></i> شاركنا نصيحة أو تجربة تفيد غيرك
+                </h3>
+                <form id="commentForm" class="space-y-4" novalidate>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="authorName" class="block text-xs md:text-sm font-bold text-slate-700 mb-1">الإسم أو الكنية</label>
+                            <input type="text" id="authorName" required placeholder="مثال: فاعل خير / أم أمين" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label for="authorRelation" class="block text-xs md:text-sm font-bold text-slate-700 mb-1">صلة القرابة بالمريض</label>
+                            <input type="text" id="authorRelation" required placeholder="مثال: أخ، والد، صديق..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="commentText" class="block text-xs md:text-sm font-bold text-slate-700 mb-1">توصيتك أو تجربتك</label>
+                        <textarea id="commentText" rows="3" required placeholder="أكتب نصيحتك هنا بكل حرية..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 font-medium text-sm"></textarea>
+                    </div>
+                    <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2.5 rounded-xl transition-colors shadow-sm text-sm md:text-base flex items-center gap-2">
+                        <i class="fas fa-paper-plane"></i> أنشر التوصية
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-slate-300 py-14 relative overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 text-center relative z-10">
+            <div class="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-slate-700">
+                <i class="fas fa-brain text-3xl text-teal-400"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-3 tracking-wide">BipoCare+ | منصة التثقيف الصحي</h2>
+            <p class="text-base md:text-lg font-medium mb-6 max-w-2xl mx-auto text-slate-400 leading-relaxed">
+                مصممة خصيصا لدعم وتثقيف العائلات والمرافقين لمرضى اضطراب ثنائي القطب.
+            </p>
+            
+            <div class="bg-slate-800/60 border border-slate-700 rounded-xl p-3 text-slate-400 text-xs font-semibold mb-8 max-w-xl mx-auto leading-relaxed">
+                ⚠️ المحتوى المعروض مخصص للأغراض التثقيفية والتعليمية فقط ولا يحل محل الاستشارة الطبية المتخصصة.
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div class="inline-flex items-center justify-center bg-slate-800/50 border border-slate-700 rounded-full px-6 py-3 shadow-inner">
+                    <i class="fas fa-graduation-cap text-emerald-400 ml-3 text-xl"></i>
+                    <span class="font-bold text-slate-200 tracking-wide text-xs md:text-sm">مشروع تخرج في علوم التمريض - UPSAT 2026</span>
+                </div>
+                <div class="inline-flex items-center justify-center bg-teal-950/40 border border-teal-800/50 rounded-full px-6 py-3 shadow-inner">
+                    <i class="fas fa-code text-teal-400 ml-3 text-base"></i>
+                    <span class="font-bold text-teal-300 tracking-wide text-xs md:text-sm">Ala & Mahran dev</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // ── AOS SÉCURISÉ (FALLBACK) ─────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof AOS !== 'undefined') {
+                AOS.init({ once: true, offset: 40, duration: 700 });
+            } else {
+                document.querySelectorAll('[data-aos]').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
+            }
+        });
+
+        window.addEventListener('load', () => {
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
+        });
+
+        // ── MODAL DISCLAIMER ────────────────────────────────────────
+        (function () {
+            const overlay = document.getElementById('modal-overlay');
+            const closeBtn = document.getElementById('closeModal');
+            if (!sessionStorage.getItem('raaya_disclaimer_seen')) {
+                overlay.classList.add('open');
+            }
+            closeBtn.addEventListener('click', () => {
+                overlay.classList.remove('open');
+                sessionStorage.setItem('raaya_disclaimer_seen', '1');
+            });
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('open');
+                    sessionStorage.setItem('raaya_disclaimer_seen', '1');
+                }
+            });
+        })();
+
+        // ── SCROLL & NAV SHADOW & SCROLL-TOP BUTTON ─────────────────
+        (function () {
+            const nav = document.getElementById('mainNav');
+            const btn = document.getElementById('scrollTopBtn');
+            window.addEventListener('scroll', () => {
+                nav.classList.toggle('scrolled', window.scrollY > 40);
+                btn.classList.toggle('show', window.scrollY > 400);
+            }, { passive: true });
+            btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        })();
+
+        // ── MOBILE MENU (ANIMATED) ──────────────────────────────────
+        (function () {
+            const menuBtn  = document.getElementById('menuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            menuBtn.addEventListener('click', () => {
+                const isOpen = mobileMenu.classList.toggle('open');
+                menuIcon.className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+                menuBtn.setAttribute('aria-expanded', isOpen);
+            });
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('open');
+                    menuIcon.className = 'fas fa-bars';
+                    menuBtn.setAttribute('aria-expanded', 'false');
+                });
+            });
+        })();
+
+        // ── STAT COUNTERS ───────────────────────────────────────────
+        (function () {
+            const counters = document.querySelectorAll('[data-count]');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const el     = entry.target;
+                    const target = parseInt(el.dataset.count);
+                    const suffix = el.dataset.suffix || '';
+                    let current  = 0;
+                    const step   = Math.ceil(target / 50);
+                    const timer  = setInterval(() => {
+                        current = Math.min(current + step, target);
+                        el.textContent = current + suffix;
+                        if (current >= target) clearInterval(timer);
+                    }, 30);
+                    observer.unobserve(el);
+                });
+            }, { threshold: 0.5 });
+            counters.forEach(c => observer.observe(c));
+        })();
+
+        // ── DYNAMIC RECOMMENDATIONS LOGIC ───────────────────────────
+        (function () {
+            const form = document.getElementById('commentForm');
+            const list = document.getElementById('commentsList');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const nameInput = document.getElementById('authorName');
+                const relInput = document.getElementById('authorRelation');
+                const textInput = document.getElementById('commentText');
+
+                if (!nameInput.value.trim() || !relInput.value.trim() || !textInput.value.trim()) {
+                    alert('الرجاء تعمير كافة الخانات لنشر التوصية بنجاح.');
+                    return;
+                }
+
+                // Generates initial initials
+                const initials = nameInput.value.trim().split(' ').map(n => n[0]).slice(0, 2).join('.');
+
+                const commentHtml = `
+                    <div class="comment-item bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex gap-4 items-start">
+                        <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold flex-shrink-0 text-sm">${initials}</div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-slate-800 text-sm md:text-base">${escapeHtml(nameInput.value)}</h4>
+                                <span class="text-xs text-slate-400">مرافقة لـ ${escapeHtml(relInput.value)} · الآن</span>
+                            </div>
+                            <p class="text-slate-600 text-sm md:text-base font-medium leading-relaxed">
+                                "${escapeHtml(textInput.value)}"
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                list.insertAdjacentHTML('afterbegin', commentHtml);
+                form.reset();
+            });
+
+            function escapeHtml(str) {
+                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+        })();
+
+        // ── DATA: Knowledge Questions ────────────────────────────────
+        const knowledgeQuestions = [
+            { text: "مرض ثنائي القطب هو مرض نفسي مزمن يتطلب متابعة.", answer: "true" },
+            { text: "المريض ينجم يعيش فترات راحة واستقرار بين النوبات.", answer: "true" },
+            { text: "النوبات متع الهوس والاكتئاب ينجمو يجيو ورا بعضهم.", answer: "true" },
+            { text: "المواظبة على الدواء تنقص برشا من خطر رجوع النوبة.", answer: "true" },
+            { text: "المتابعة مع الطبيب ضرورية كان كي يمرض، كي يولي لباس يقص.", answer: "false" },
+            { text: "الضغط والدعم النفسي يأثر برشا على استقرار حالة المريض.", answer: "true" },
+            { text: "كي تحكي مع المريض وتسمعلو بهدوء، تريحو وتنقصلو الستراس.", answer: "true" },
+            { text: "العزلة المفاجئة تنجم تكون علامة تتطلب الانتباه والتقارب.", answer: "true" },
+            { text: "تلميحات اليأس والإحباط الشديد لازم ناخووها بجدية تامة ديما.", answer: "true" },
+            { text: "الحزن المتواصل ينجم يكون نوبة اكتئاب.", answer: "true" },
+            { text: "القصان الفجئي للدواء يزيد من احتمال الانتكاسة.", answer: "true" },
+            { text: "زيادة غير عادية في النشاط وقلة النوم هي نوبة هوس.", answer: "true" },
+            { text: "التبديل الفجئي في التصرفات يستدعي التواصل مع الطبيب.", answer: "true" },
+            { text: "المرافق (العايلة) عندو دور أساسي في احتواء المريض ودعمه.", answer: "true" },
+            { text: "تقلب المزاج العنيف يدل على ضرورة توفير بيئة هادئة.", answer: "true" },
+            { text: "لازم المرافق يعرف أرقام الدعم المباشر والطبيب مسبقاً.", answer: "true" }
+        ];
+
+        // ── DATA: Zarit Scale ────────────────────────────────────────
+        const zaritQuestions = [
+            "تحس اللي المريض يطلب منك إعانة أكثر ماللازم؟", "تحس اللي الوقت معاه ما يخليلكش وقت لروحك؟",
+            "تحس روحك مضغوط بينو وبين مسؤولياتك لخرين؟", "تحس بالحشمة من تصرفاتو قدام العباد؟",
+            "تتغشش وتتنرفز كي تبدا معاه؟", "أثر خايب على علاقاتك مع بقية العايلة؟",
+            "تخاف ماللي مخبيه المستقبل؟", "تحس اللي هو معمل عليك إنت بالذات في كل شي؟",
+            "تتوتر وتتقلق كي تبدا بحذاه؟", "تحس اللي صحتك تراجعت جرت التلهية بيه؟",
+            "تحس اللي ماعادش عندك حياتك الخاصة (Intimité)؟", "حياتك الاجتماعية (خرجات) نقصت بسببو؟",
+            "تحشم بش تجيب صحابك لدارك جرتو؟", "يستنى منك تتلهى بيه وحدك وما يعمّل على حد آخر؟",
+            "ماعادش تخلط ماديا بش تتلهى بيه؟", "تحس اللي ماعادش تنجم تزيد تصبر أكثر؟",
+            "فقدت السيطرة على حياتك ملي مرض؟", "تتمنى كان جا فما شكون يتلهى بيه بلاصتك؟",
+            "تحس روحك حاير وما تعرفش شتعملو؟", "تحس اللي لازمك تزيد تعمل أكثر ملي قاعد تعمل؟",
+            "تحس اللي تنجم تتلهى بيه ما خير؟", "في اللخر، التلهية بيه ولات حمل رزين وعبء كبير عليك؟"
+        ];
+
+        const zaritOptions = [
+            { text: "أبداً", value: 0 }, { text: "نادراً", value: 1 },
+            { text: "أحياناً", value: 2 }, { text: "غالباً", value: 3 }, { text: "ديما", value: 4 }
+        ];
+
+        // Generate Knowledge HTML
+        const knowledgeContainer = document.getElementById('knowledgeQuestionsContainer');
+        knowledgeQuestions.forEach((q, index) => {
+            const html = `
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 hover:border-teal-200 transition-colors">
+                    <p class="font-bold text-slate-700 mb-4 text-right text-base md:text-lg leading-relaxed">${index + 1}. ${q.text}</p>
+                    <div class="radio-grid tf-grid">
+                        <div>
+                            <input type="radio" id="kqt_${index}" name="kq${index}" value="true" class="radio-input tf-true">
+                            <label for="kqt_${index}" class="radio-label"><i class="fas fa-check ml-1.5 text-emerald-500"></i> صحيح</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="kqf_${index}" name="kq${index}" value="false" class="radio-input tf-false">
+                            <label for="kqf_${index}" class="radio-label"><i class="fas fa-times ml-1.5 text-red-400"></i> غالط</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            knowledgeContainer.insertAdjacentHTML('beforeend', html);
+        });
+
+        // Generate Zarit HTML
+        const zaritContainer = document.getElementById('zaritQuestionsContainer');
+        zaritQuestions.forEach((q, index) => {
+            let optionsHtml = '';
+            zaritOptions.forEach((opt, oIndex) => {
+                optionsHtml += `
+                    <div>
+                        <input type="radio" id="zq_${index}_${oIndex}" name="zq${index}" value="${opt.value}" class="radio-input">
+                        <label for="zq_${index}_${oIndex}" class="radio-label text-xs md:text-sm">${opt.text}</label>
+                    </div>
+                `;
+            });
+            const html = `
+                <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-amber-300 transition-colors">
+                    <label class="font-bold text-base md:text-lg block mb-4 text-slate-800 leading-relaxed">${index + 1}. ${q}</label>
+                    <div class="radio-grid">${optionsHtml}</div>
+                </div>
+            `;
+            zaritContainer.insertAdjacentHTML('beforeend', html);
+        });
+
+        // ── TABS LOGIC ───────────────────────────────────────────────
+        const tabKnowledge  = document.getElementById('tabKnowledge');
+        const tabZarit      = document.getElementById('tabZarit');
+        const knowledgeForm = document.getElementById('knowledgeForm');
+        const zaritForm     = document.getElementById('zaritForm');
+
+        tabKnowledge.addEventListener('click', () => {
+            tabKnowledge.className = 'flex-1 py-3.5 px-6 rounded-xl font-bold text-base md:text-lg transition-all duration-300 bg-teal-600 text-white shadow-md';
+            tabZarit.className     = 'flex-1 py-3.5 px-6 rounded-xl font-bold text-base md:text-lg text-slate-500 hover:text-slate-700 transition-all duration-300 bg-transparent';
+            tabKnowledge.setAttribute('aria-selected', 'true');
+            tabZarit.setAttribute('aria-selected', 'false');
+            knowledgeForm.classList.remove('hidden');
+            zaritForm.classList.add('hidden');
+        });
+
+        tabZarit.addEventListener('click', () => {
+            tabZarit.className     = 'flex-1 py-3.5 px-6 rounded-xl font-bold text-base md:text-lg transition-all duration-300 bg-amber-500 text-white shadow-md';
+            tabKnowledge.className = 'flex-1 py-3.5 px-6 rounded-xl font-bold text-base md:text-lg text-slate-500 hover:text-slate-700 transition-all duration-300 bg-transparent';
+            tabZarit.setAttribute('aria-selected', 'true');
+            tabKnowledge.setAttribute('aria-selected', 'false');
+            zaritForm.classList.remove('hidden');
+            knowledgeForm.classList.add('hidden');
+        });
+
+        // ── SUBMIT: Knowledge ────────────────────────────────────────
+        document.getElementById('submitKnowledge').addEventListener('click', function() {
+            const errorEl = document.getElementById('knowledgeError');
+            let score = 0, answered = 0;
+            knowledgeQuestions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="kq${index}"]:checked`);
+                if (selected) {
+                    answered++;
+                    if (selected.value === q.answer) score++;
+                }
+            });
+            
+            if (answered < knowledgeQuestions.length) {
+                errorEl.classList.remove('hidden');
+                errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            errorEl.classList.add('hidden');
+            
+            const resultDiv = document.getElementById('knowledgeResult');
+            const percentage = Math.round((score / knowledgeQuestions.length) * 100);
+            let message, advice, styleClass;
+            
+            if (score >= 13) {
+                styleClass = 'bg-emerald-50 border-2 border-emerald-200 text-emerald-800';
+                message = `ممتاز! (${percentage}%) 🌟`;
+                advice  = 'معلوماتك التثقيفية ممتازة. إنت فاهم مليح المرض ودورك كمرافق. واصل هكا!';
+            } else if (score >= 8) {
+                styleClass = 'bg-blue-50 border-2 border-blue-200 text-blue-800';
+                message = `متوسط (${percentage}%) 📖`;
+                advice  = 'عندك فكرة باهية، أما مزلت لازمك ترجع تقرا الكتيب التوعوي الفوق باش تثبت معلوماتك أكثر.';
+            } else {
+                styleClass = 'bg-red-50 border-2 border-red-200 text-red-800';
+                message = `ناقص شوية (${percentage}%) ⚠️`;
+                advice  = 'ننصحك ترجع تقرا الكتيب التوعوي بتمعن باش تفهم آليات الدعم الفعالة وتستحفظ على المريض.';
+            }
+            
+            resultDiv.className = `mt-8 p-8 rounded-2xl text-center result-show ${styleClass}`;
+            resultDiv.innerHTML = `
+                <div class="text-5xl md:text-6xl mb-4 font-extrabold">${score}/${knowledgeQuestions.length}</div>
+                <h4 class="text-2xl md:text-3xl font-bold mb-4">${message}</h4>
+                <p class="text-base md:text-lg font-semibold bg-white/60 p-4 rounded-xl inline-block shadow-sm leading-relaxed max-w-lg">${advice}</p>
+                ${score < 13 ? `<div class="mt-5"><a href="#brochure" class="inline-block bg-white border border-current px-5 py-2 rounded-xl font-bold text-sm hover:opacity-80 transition-opacity">← ارجع للكتيب التوعوي</a></div>` : ''}
+            `;
+            resultDiv.classList.remove('hidden');
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+
+        // ── SUBMIT: Zarit ────────────────────────────────────────────
+        document.getElementById('submitZarit').addEventListener('click', function() {
+            const errorEl = document.getElementById('zaritError');
+            let totalScore = 0, answered = 0;
+            zaritQuestions.forEach((_, index) => {
+                const selected = document.querySelector(`input[name="zq${index}"]:checked`);
+                if (selected) {
+                    answered++;
+                    totalScore += parseInt(selected.value);
+                }
+            });
+
+            if (answered < zaritQuestions.length) {
+                errorEl.classList.remove('hidden');
+                errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            errorEl.classList.add('hidden');
+            
+            const resultDiv = document.getElementById('zaritResult');
+            const maxScore  = zaritQuestions.length * 4;
+            const pct       = Math.round((totalScore / maxScore) * 100);
+            
+            let level, advice, styleClass, barColor;
+            
+            if (totalScore <= 20) {
+                level      = 'تعب خفيف (أمورك هانية) 😊';
+                advice     = 'الحمد لله، الأمور تحت السيطرة. كمل هكا، وما تنساش تاخو ديما وقت لروحك.';
+                styleClass = 'bg-emerald-50 border-2 border-emerald-200 text-emerald-900';
+                barColor   = '#10b981';
+            } else if (totalScore <= 40) {
+                level      = 'تعب متوسط ⚡';
+                advice     = 'بديت تتعب. حاول تقسم المسؤولية مع العايلة، وما تخليش روحك وحدك للضغط.';
+                styleClass = 'bg-yellow-50 border-2 border-yellow-200 text-yellow-900';
+                barColor   = '#f59e0b';
+            } else if (totalScore <= 60) {
+                level      = 'تعب كبير (ضغط عالي) ⚠️';
+                advice     = 'راك واصل لمرحلة تتطلب الانتباه! لازمك ترتاح وتطلب مساعدة، صحتك النفسية أولوية.';
+                styleClass = 'bg-orange-50 border-2 border-orange-200 text-orange-900';
+                barColor   = '#f97316';
+            } else {
+                level      = 'إرهاق شديد (ضغط أقصى) 🚨';
+                advice     = 'تنبيه! راك تعاني من إرهاق كبير. لازمك عاجلاً تشوف مختص يدعمك وتخصص وقت لراحتك.';
+                styleClass = 'bg-red-50 border-2 border-red-300 text-red-900';
+                barColor   = '#ef4444';
+            }
+            
+            resultDiv.className = `mt-8 p-8 rounded-2xl text-center result-show ${styleClass}`;
+            resultDiv.innerHTML = `
+                <p class="text-base font-bold mb-2 opacity-75">السكور الجملي: ${totalScore}/${maxScore}</p>
+                <div class="max-w-xs mx-auto mb-4">
+                    <div class="progress-bar h-4 rounded-full bg-slate-200/80 border border-black/5">
+                        <div class="progress-fill rounded-full" style="--target-width:${pct}%; background:${barColor}"></div>
+                    </div>
+                    <p class="text-xs font-bold mt-1 opacity-60">${pct}%</p>
+                </div>
+                <h4 class="text-2xl md:text-3xl font-extrabold mb-4">${level}</h4>
+                <div class="bg-white/70 p-5 rounded-xl inline-block shadow-sm border border-black/5 max-w-lg leading-relaxed">
+                    <p class="text-base md:text-lg font-bold">💡 ${advice}</p>
+                </div>
+                ${totalScore > 40 ? `<div class="mt-5 bg-white/80 border border-current rounded-xl px-5 py-3 inline-block text-xs md:text-sm font-bold"><i class="fas fa-phone ml-2"></i>لا تتردد في طلب الدعم المباشر: <a href="tel:71600037" class="underline font-extrabold" dir="ltr">037 600 71</a></div>` : ''}
+            `;
+            resultDiv.classList.remove('hidden');
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+</body>
+</html>
